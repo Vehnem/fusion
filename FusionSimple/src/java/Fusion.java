@@ -1,18 +1,11 @@
 import com.hp.hpl.jena.rdf.model.*;
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
-import org.dbpedia.fusion.WikidataQ;
 import org.rdfhdt.hdt.exceptions.NotFoundException;
-import org.rdfhdt.hdt.exceptions.ParserException;
 import org.rdfhdt.hdt.hdt.HDT;
-import org.rdfhdt.hdt.hdt.HDTFactory;
 import org.rdfhdt.hdt.hdt.HDTManager;
-import org.rdfhdt.hdt.options.HDTOptions;
-import org.rdfhdt.hdt.options.HDTSpecification;
-import org.rdfhdt.hdt.rdf.RDFStorage;
 import org.rdfhdt.hdt.triples.IteratorTripleString;
 import org.rdfhdt.hdt.triples.TripleString;
+import org.dbpedia.fusion.WikidataQ;
 
 import java.io.*;
 import java.util.*;
