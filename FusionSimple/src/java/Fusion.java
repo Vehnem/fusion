@@ -107,10 +107,17 @@ public class Fusion{
 
         }
 
-//        for ( String d : data.keySet()  ) {
-            System.out.println("Fused Triples "+data.get("fused").size());
-//        }
-//        System.out.println("preference en > de > sv > nl > fr");
+        System.out.println("Fused Triples "+data.get("fused").size());
+
+        String pref = "";
+        for (int s = 0; s < laOrd.size() ; s++) {
+            if (s == laOrd.size() - 1) {
+                pref += laOrd.get(s);
+            } else {
+                pref += laOrd.get(s) + " > ";
+            }
+        }
+        System.out.println("preference "+pref);
     }
 
     public static Map getMap() {
@@ -127,7 +134,7 @@ public class Fusion{
                     System.err.println(e.getMessage());
                 }
             }
-            System.out.println("loaded " + langToHDT.size() + "/" + Properties.languages.length);
+            System.out.println("loaded " + langToHDT.size() + "/" + laOrd.size());
         }
 
         return langToHDT;
