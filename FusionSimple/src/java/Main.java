@@ -27,7 +27,7 @@ public class Main {
         Options options = new Options();
         options.addOption("i", "input", true, "input folder");
         options.addOption("o", "out", true, "output folder");
-        options.addOption("l", "languages", true, "languages fil");
+        options.addOption("l", "languages", true, "languages file");
         options.addOption("h", "help", false, "show this help");
         options.addOption("q", "q", true, "max ID");
 

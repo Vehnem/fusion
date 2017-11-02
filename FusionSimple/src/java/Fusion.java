@@ -31,6 +31,7 @@ public class Fusion{
 
     public static void run () {
 
+        // TODO start variable
         int i = 1;
 
         Map<String, HDT> l = getMap();
@@ -65,7 +66,7 @@ public class Fusion{
                         while (it.hasNext()) {
 //                            System.out.println(o);
                             TripleString ts = it.next();
-                            data.get(o).add(ts);
+//                            data.get(o).add(ts);
                             if( notFound ) {
                                 data.get("fused").add(ts);
                                 notFound = false;
@@ -82,7 +83,7 @@ public class Fusion{
                         while (it.hasNext()) {
 //                            System.out.println(o);
                             TripleString ts = it.next();
-                            data.get(o).add(ts);
+//                            data.get(o).add(ts);
                             if( notFound ) {
                                 data.get("fused").add(ts);
                                 notFound = false;
@@ -111,10 +112,10 @@ public class Fusion{
 
         }
 
-        for ( String d : data.keySet()  ) {
-            System.out.println("Size "+d+" "+data.get(d).size());
-        }
-        //System.out.println("preference en > de > sv > nl > fr");
+//        for ( String d : data.keySet()  ) {
+            System.out.println("Fused Triples "+data.get("fused").size());
+//        }
+//        System.out.println("preference en > de > sv > nl > fr");
     }
 
     public static Map getMap() {
