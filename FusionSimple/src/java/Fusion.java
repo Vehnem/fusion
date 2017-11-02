@@ -5,7 +5,6 @@ import org.rdfhdt.hdt.hdt.HDT;
 import org.rdfhdt.hdt.hdt.HDTManager;
 import org.rdfhdt.hdt.triples.IteratorTripleString;
 import org.rdfhdt.hdt.triples.TripleString;
-import org.dbpedia.fusion.WikidataQ;
 
 import java.io.*;
 import java.util.*;
@@ -27,8 +26,6 @@ public class Fusion{
         run();
     }
 
-    public static Map<String,Object> main_map = new HashMap<String,Object>();
-
     public static void run () {
 
         // TODO start variable
@@ -49,9 +46,7 @@ public class Fusion{
 //        System.exit(0);
         for (; i < qs; i++) {
             String wdUri = "http://wikidata.dbpedia.org/resource/Q" + i;
-            WikidataQ valag = new WikidataQ(wdUri);
 
-            Map<String,Object> mp2 = new HashMap<String,Object>();
             for (String property : Properties.properties) {
 
                 boolean notFound = true;
