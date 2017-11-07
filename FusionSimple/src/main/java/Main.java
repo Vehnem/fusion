@@ -12,6 +12,7 @@ import java.io.*;
 import java.security.cert.TrustAnchor;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 public class Main {
@@ -75,7 +76,7 @@ public class Main {
         }
 
         try {
-            FileReader fr = new FileReader("dsorder");
+            FileReader fr = new FileReader(laFil);
             BufferedReader br = new BufferedReader(fr);
             String line;
             while( ( line = br.readLine() ) != null ) {
@@ -85,6 +86,16 @@ public class Main {
         } catch (FileNotFoundException fne) {// TODO
         } catch (IOException ioe ) {// TODO
         }
+
+        String pref = "";
+        for (int s = 0; s < laOrd.size() ; s++) {
+            if (s == laOrd.size() - 1) {
+                pref += laOrd.get(s);
+            } else {
+                pref += laOrd.get(s) + " > ";
+            }
+        }
+        System.out.println("preference "+pref);
 
         // Fusion part
         new Fusion(laOrd, inDir, maxQs, ouDir, gz);

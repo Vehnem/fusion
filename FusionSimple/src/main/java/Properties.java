@@ -2,7 +2,7 @@ public class Properties {
 
 //    public static String[] languages =  {"en","nl","sv","fr","de"};
 
-    public static String[] languages = {"en","de","sv","nl","fr"};
+//    public static String[] languages = {"en","de","sv","nl","fr"};
 
     static String[] properties = new String[]{
             "acceleration",
