@@ -6,27 +6,40 @@ import org.rdfhdt.hdt.triples.TripleString;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.util.HashSet;
 
 public class Test {
+
     public static void main(String[] agrs) {
+
+        String[] languages = {"en","de","sv","nl","fr"};
         // Test
-        String inDir = "/home/vehnem/workspace/fusion_data/downloads.dbpedia.org/2016-10/tmp/data/";
-        Model mainmodel = ModelFactory.createDefaultModel();
-        try {
-            HDT hdt = HDTManager.loadIndexedHDT(inDir+"wikidata"+"/wkd_uris_selection.gz.hdt", null);
-            IteratorTripleString it = hdt.search("http://wikidata.dbpedia.org/resource/Q10001", "http://dbpedia.org/ontology/populationTotal", "");
-            while (it.hasNext()) {
-                TripleString ts = it.next();
-                System.out.println(ts);
+        String inDir = "/home/vehnem/workspace/fusion_data/new/";
+
+        HashSet<String> types = new HashSet<String>();
+//        for( i; i <= 100000: languages) {
+            try {
+//                HDT hdt = HDTManager.loadIndexedHDT(inDir +"wikidata" + "/wkd_uris_selection.gz.hdt", null);
+                HDT hdt = HDTManager.loadIndexedHDT("/home/vehnem/workspace/fusion_data/out/k100fused/fused.nt", null);
+                IteratorTripleString it = hdt.search("http://wikidata.dbpedia.org/resource/Q76548",
+                        "", "");
+                while (it.hasNext()) {
+                    TripleString ts = it.next();
+                    types.add(ts.getPredicate().toString());
 //                TripleStringHelper h = new TripleStringHelper(ts);
 //                //mainmodel.add(getAsStatement(ts));
 //                FileWriter fw = new FileWriter(new File("test"));
 //                fw.write(h.asNtriple().toString());
 //                fw.close();
 //                break;
+                }
+            } catch (Exception e) {
+                System.out.println(e.toString());
             }
-        } catch (Exception e) {
-            System.out.println(e.toString());
+//        }
+
+        for(String t : types ) {
+            System.out.println(t);
         }
 
 //        Model m = ModelFactory.createDefaultModel();

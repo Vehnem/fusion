@@ -75,6 +75,7 @@ public class Main {
             System.exit(1);
         }
 
+        // TODO File or multi value
         try {
             FileReader fr = new FileReader(laFil);
             BufferedReader br = new BufferedReader(fr);
@@ -97,6 +98,10 @@ public class Main {
         }
         System.out.println("preference "+pref);
 
+        boolean success = new File(ouDir).mkdirs();
+        if (!success) {
+            System.err.println(ouDir+" creation failed");
+        }
         // Fusion part
         new Fusion(laOrd, inDir, maxQs, ouDir, gz);
 

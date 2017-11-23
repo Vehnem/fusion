@@ -55,8 +55,8 @@ public static Map<String,Set<String>> data = new HashMap<String,Set<String>>();
 
                 for (String o : laOrd) {
                     if(found) break;
+                    HDT hdt = l.get(o);
                     try {
-                        HDT hdt = l.get(o);
                         IteratorTripleString it = hdt.search(wdUri, "http://dbpedia.org/ontology/" + property, "");
                         //if( it.hasNext() ) it = hdt.search(wdUri, "http://wikidata.dbpedia.org/ontology/" + property, "");
                         while (it.hasNext()) {
@@ -69,8 +69,23 @@ public static Map<String,Set<String>> data = new HashMap<String,Set<String>>();
                     } catch (NotFoundException nfe) {
                         // TODO
                     } catch (IOException e) {
-
-                }
+                        // TODO
+                    }
+                    try {
+                        IteratorTripleString it = hdt.search(wdUri, "http://wikidata.dbpedia.org/ontology/" + property, "");
+                        //if( it.hasNext() ) it = hdt.search(wdUri, "http://wikidata.dbpedia.org/ontology/" + property, "");
+                        while (it.hasNext()) {
+                            TripleString ts = it.next();
+//                            data.get(o).add(ts);
+                            data.get("fused").add(ts.asNtriple().toString());
+                            found = true;
+                            break;
+                        }
+                    } catch (NotFoundException nfe) {
+                        // TODO
+                    } catch (IOException e) {
+                        // TODO
+                    }
                 }
             }
             handleLables(wdUri);
