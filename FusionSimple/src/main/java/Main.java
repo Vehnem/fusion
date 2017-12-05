@@ -24,6 +24,7 @@ public class Main {
         String inDir = null;
         String ouDir = null;
         String laFil = null;
+        String ids = null;
         boolean gz = false;
         List<String> laOrd = new ArrayList<String>();
 
@@ -38,6 +39,7 @@ public class Main {
         options.addOption("h", "help", false, "show this help");
         options.addOption("q", "q", true, "max ID");
         options.addOption("gz","gzip",false,"gzip output files");
+        options.addOption("n","ids",true,"id uri list");
 
 //        Option option = new Option("l", "language order list");
 //        option.setArgs(Option.UNLIMITED_VALUES);
@@ -54,10 +56,11 @@ public class Main {
                 System.exit(0);
             }
 
-            if (commandLine.hasOption("i")&&commandLine.hasOption("o")&&commandLine.hasOption("l")) {
+            if (commandLine.hasOption("i")&&commandLine.hasOption("o")&&commandLine.hasOption("l")&&commandLine.hasOption("n")) {
                 inDir = commandLine.getOptionValue("i");
                 ouDir = commandLine.getOptionValue("o");
                 laFil = commandLine.getOptionValue("l");
+                ids = commandLine.getOptionValue("n");
                 if( commandLine.hasOption("q")) {
                     maxQs = Integer.parseInt(commandLine.getOptionValue("q"));
                 }
@@ -98,12 +101,27 @@ public class Main {
         }
         System.out.println("preference "+pref);
 
-        boolean success = new File(ouDir).mkdirs();
-        if (!success) {
-            System.err.println(ouDir+" creation failed");
-        }
+//        boolean success = new File(ouDir).mkdirs();
+//        if (!success) {
+//            System.err.println(ouDir+" creation failed");
+//        }
         // Fusion part
-        new Fusion(laOrd, inDir, maxQs, ouDir, gz);
+
+        List<String> wkdUris = new ArrayList<>();
+        // TODO File or multi value
+        try {
+            FileReader fr = new FileReader(ids);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            while( ( line = br.readLine() ) != null ) {
+                wkdUris.add(line);
+            }
+
+        } catch (FileNotFoundException fne) {// TODO
+        } catch (IOException ioe ) {// TODO
+        }
+
+        new Fusion(laOrd,wkdUris, inDir, maxQs, ouDir, gz);
 
     }
 }

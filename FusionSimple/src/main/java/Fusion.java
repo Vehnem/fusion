@@ -19,17 +19,19 @@ public class Fusion{
     public static String ouDir = "";
     public static List<String> laOrd = new ArrayList<String>();
     public static Map<String, HDT> l = null;
+    public static List<String> wkdUris = null;
     private static boolean gz = false;
 
 // public static Map<String,List<TripleString>> data = new HashMap<String,List<TripleString>>();
 public static Map<String,Set<String>> data = new HashMap<String,Set<String>>();
 
-    public Fusion(List<String> laOrd, String inDir, int maxQs, String ouDir, boolean gz) {
+    public Fusion(List<String> laOrd, List wkdUris, String inDir, int maxQs, String ouDir, boolean gz) {
         this.inDir = inDir;
         this.laOrd = laOrd;
         this.qs = maxQs;
         this.ouDir = ouDir;
         this.gz = gz;
+        this.wkdUris = wkdUris;
         run();
     }
 
@@ -47,8 +49,8 @@ public static Map<String,Set<String>> data = new HashMap<String,Set<String>>();
 
         data.put("fused",new HashSet<String>());
 
-        for (; i < qs; i++) {
-            String wdUri = "http://wikidata.dbpedia.org/resource/Q" + i;
+        for (String n : wkdUris) {
+            String wdUri = "http://wikidata.dbpedia.org/resource/Q" + n;
 
             for (String property : Properties.properties) {
                 boolean found = false;

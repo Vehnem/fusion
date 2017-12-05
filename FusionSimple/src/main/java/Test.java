@@ -6,26 +6,37 @@ import org.rdfhdt.hdt.triples.TripleString;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Test {
 
-    public static void main(String[] agrs) {
+    private static final Logger log = Logger.getLogger( Test.class.getName() );
+    public static void main(String[] agrs) throws IOException{
 
+        int maxID = 1;
+        List<Integer> ids = new ArrayList<Integer>();
         String[] languages = {"en","de","sv","nl","fr"};
         // Test
         String inDir = "/home/vehnem/workspace/fusion_data/new/";
 
+        HDT hdt = HDTManager.loadIndexedHDT(inDir +"wikidata" + "/wkd_uris_selection.gz.hdt", null);
+        String last = "";
         HashSet<String> types = new HashSet<String>();
-//        for( i; i <= 100000: languages) {
+//        int i = 20000000;
+//        while(true){
             try {
-//                HDT hdt = HDTManager.loadIndexedHDT(inDir +"wikidata" + "/wkd_uris_selection.gz.hdt", null);
-                HDT hdt = HDTManager.loadIndexedHDT("/home/vehnem/workspace/fusion_data/out/k100fused/fused.nt", null);
-                IteratorTripleString it = hdt.search("http://wikidata.dbpedia.org/resource/Q76548",
+//                HDT hdt = HDTManager.loadIndexedHDT("/home/vehnem/workspace/fusion_data/new/k100fused/fused.nt", null);
+                IteratorTripleString it = hdt.search("",
                         "", "");
                 while (it.hasNext()) {
                     TripleString ts = it.next();
-                    types.add(ts.getPredicate().toString());
+                    int id = Integer.parseInt(ts.getSubject().toString().substring(38));
+                    maxID = id > maxID ?  id :  maxID;
 //                TripleStringHelper h = new TripleStringHelper(ts);
 //                //mainmodel.add(getAsStatement(ts));
 //                FileWriter fw = new FileWriter(new File("test"));
@@ -36,11 +47,13 @@ public class Test {
             } catch (Exception e) {
                 System.out.println(e.toString());
             }
+//            i++;
+            log.info(String.valueOf(maxID));
 //        }
 
-        for(String t : types ) {
-            System.out.println(t);
-        }
+//        for(String t : types ) {
+//            System.out.println(t);
+//        }
 
 //        Model m = ModelFactory.createDefaultModel();
 //        Statement st = ResourceFactory.createStatement(ResourceFactory.createResource("http://foo.org/q1"),
