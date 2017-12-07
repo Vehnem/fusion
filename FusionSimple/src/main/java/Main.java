@@ -1,19 +1,10 @@
 
-import com.hp.hpl.jena.rdf.model.*;
-import com.sun.org.apache.xpath.internal.SourceTree;
 import org.apache.commons.cli.*;
-import org.rdfhdt.hdt.hdt.HDT;
-import org.rdfhdt.hdt.hdt.HDTManager;
-import org.rdfhdt.hdt.triples.IteratorTripleString;
-import org.rdfhdt.hdt.triples.TripleString;
 
-import javax.jws.WebParam;
 import java.io.*;
-import java.security.cert.TrustAnchor;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class Main {
 
@@ -22,11 +13,11 @@ public class Main {
         // Core data
         int    maxQs = 0;
         String inDir = null;
-        String ouDir = null;
-        String laFil = null;
+        String out = null;
+        String prefFile = null;
         String ids = null;
         boolean gz = false;
-        List<String> laOrd = new ArrayList<String>();
+        List<String> pref = new ArrayList<String>();
 
         // Cli
 
@@ -34,12 +25,11 @@ public class Main {
 
         Options options = new Options();
         options.addOption("i", "input", true, "input folder");
-        options.addOption("o", "out", true, "output folder");
-        options.addOption("l", "languages", true, "languages file");
+        options.addOption("o", "out", true, "output file");
+        options.addOption("p", "languages", true, "preference file");
         options.addOption("h", "help", false, "show this help");
-        options.addOption("q", "q", true, "max ID");
-        options.addOption("gz","gzip",false,"gzip output files");
-        options.addOption("n","ids",true,"id uri list");
+//        options.addOption("gz","gzip",false,"gzip output files");
+        options.addOption("q","ids",true,"wkd id list");
 
 //        Option option = new Option("l", "language order list");
 //        option.setArgs(Option.UNLIMITED_VALUES);
@@ -56,14 +46,11 @@ public class Main {
                 System.exit(0);
             }
 
-            if (commandLine.hasOption("i")&&commandLine.hasOption("o")&&commandLine.hasOption("l")&&commandLine.hasOption("n")) {
+            if (commandLine.hasOption("i")&&commandLine.hasOption("o")&&commandLine.hasOption("p")&&commandLine.hasOption("q")) {
                 inDir = commandLine.getOptionValue("i");
-                ouDir = commandLine.getOptionValue("o");
-                laFil = commandLine.getOptionValue("l");
-                ids = commandLine.getOptionValue("n");
-                if( commandLine.hasOption("q")) {
-                    maxQs = Integer.parseInt(commandLine.getOptionValue("q"));
-                }
+                out = commandLine.getOptionValue("o");
+                prefFile = commandLine.getOptionValue("p");
+                ids = commandLine.getOptionValue("q");
                 if( commandLine.hasOption("gz")) {
                     gz = true;
                 }
@@ -80,35 +67,42 @@ public class Main {
 
         // TODO File or multi value
         try {
-            FileReader fr = new FileReader(laFil);
+            FileReader fr = new FileReader(prefFile);
             BufferedReader br = new BufferedReader(fr);
             String line;
             while( ( line = br.readLine() ) != null ) {
-                laOrd.add(line);
+                pref.add(line);
             }
 
-        } catch (FileNotFoundException fne) {// TODO
-        } catch (IOException ioe ) {// TODO
+        } catch (FileNotFoundException fne) { fne.printStackTrace();
+        } catch (IOException ioe ) { ioe.printStackTrace();
         }
 
-        String pref = "";
-        for (int s = 0; s < laOrd.size() ; s++) {
-            if (s == laOrd.size() - 1) {
-                pref += laOrd.get(s);
+        // PREFERENCE
+        String pref_out = "";
+        for (int s = 0; s < pref.size() ; s++) {
+            if (s == pref.size() - 1) {
+                pref_out += pref.get(s);
             } else {
-                pref += laOrd.get(s) + " > ";
+                pref_out += pref.get(s) + " > ";
             }
         }
-        System.out.println("preference "+pref);
+        System.out.println("HDT FUSION");
+        System.out.println("==========");
+        System.out.println("preference: "+pref_out);
 
-//        boolean success = new File(ouDir).mkdirs();
-//        if (!success) {
-//            System.err.println(ouDir+" creation failed");
-//        }
-        // Fusion part
+        // CREATE DIRs
+        File file = new File(out);
+        if(!file.getParentFile().exists()) {
+            if (!file.getParentFile().mkdirs()) {
+                Logger.getGlobal().warning("Failed to create directory " + file.getParent());
+            } else {
+                Logger.getGlobal().info("Created directory "+ file.getParent());
+            }
+        }
 
+        // READ ids
         List<String> wkdUris = new ArrayList<>();
-        // TODO File or multi value
         try {
             FileReader fr = new FileReader(ids);
             BufferedReader br = new BufferedReader(fr);
@@ -116,12 +110,18 @@ public class Main {
             while( ( line = br.readLine() ) != null ) {
                 wkdUris.add(line);
             }
-
-        } catch (FileNotFoundException fne) {// TODO
-        } catch (IOException ioe ) {// TODO
+        } catch (FileNotFoundException fne) {
+            fne.printStackTrace();
+        } catch (IOException ioe ) {
+            ioe.printStackTrace();
         }
 
-        new Fusion(laOrd,wkdUris, inDir, maxQs, ouDir, gz);
+        // Fusion part
+        long start = System.currentTimeMillis();
+        new Fusion(pref,wkdUris, inDir, out, gz);
+        long end = System.currentTimeMillis();
+        Logger.getGlobal().info("Took : " + ((end - start) / 1000)+" seconds");
+
 
     }
 }

@@ -1,4 +1,3 @@
-import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import org.apache.commons.collections.map.HashedMap;
@@ -10,138 +9,90 @@ import org.rdfhdt.hdt.triples.TripleString;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.zip.GZIPOutputStream;
 
-public class Fusion{
+public class Fusion {
 
-    public static int qs = 0;
-    public static String inDir = "";
-    public static String ouDir = "";
-    public static List<String> laOrd = new ArrayList<String>();
-    public static Map<String, HDT> l = null;
-    public static List<String> wkdUris = null;
-    private static boolean gz = false;
+    protected static FileWriter fw = null;
+    protected static String inDir = null;
 
-// public static Map<String,List<TripleString>> data = new HashMap<String,List<TripleString>>();
-public static Map<String,Set<String>> data = new HashMap<String,Set<String>>();
+    protected static boolean gz = false;
+    protected static List<String> prefOrd = new ArrayList<String>();
 
-    public Fusion(List<String> laOrd, List wkdUris, String inDir, int maxQs, String ouDir, boolean gz) {
+
+    protected static List<String> wkdUris = null;
+    protected static Map<String, HDT> l = null;
+
+    public Fusion(List<String> prefOrd, List wkdUris, String inDir, String out, boolean gz) {
         this.inDir = inDir;
-        this.laOrd = laOrd;
-        this.qs = maxQs;
-        this.ouDir = ouDir;
+        this.prefOrd = prefOrd;
         this.gz = gz;
         this.wkdUris = wkdUris;
+
+        try {
+            fw = new FileWriter(out);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         run();
+
     }
 
     public static void run () {
-        // TODO start as input
-
-        int i = 1;
         l = getMap();
+        for ( String wkdId : wkdUris) {//(String n : wkdUris) {
+            HashSet<String> entityTriple= fuseEntity(wkdId);
+             writeEntityData(entityTriple, wkdId);
+        }
+    }
 
-        // TODO change to set
-//        for(String o : Properties.languages) {
-//            data.put(o, new HashSet<String>());
-////            data.put(o, ModelFactory.createDefaultModel());
-//        }
-
-        data.put("fused",new HashSet<String>());
-
-        for (String n : wkdUris) {
-            String wdUri = "http://wikidata.dbpedia.org/resource/Q" + n;
-
-            for (String property : Properties.properties) {
-                boolean found = false;
-
-                for (String o : laOrd) {
-                    if(found) break;
-                    HDT hdt = l.get(o);
-                    try {
-                        IteratorTripleString it = hdt.search(wdUri, "http://dbpedia.org/ontology/" + property, "");
-                        //if( it.hasNext() ) it = hdt.search(wdUri, "http://wikidata.dbpedia.org/ontology/" + property, "");
-                        while (it.hasNext()) {
-                            TripleString ts = it.next();
-//                            data.get(o).add(ts);
-                            data.get("fused").add(ts.asNtriple().toString());
-                            found = true;
-                            break;
-                        }
-                    } catch (NotFoundException nfe) {
-                        // TODO
-                    } catch (IOException e) {
-                        // TODO
-                    }
-                    try {
-                        IteratorTripleString it = hdt.search(wdUri, "http://wikidata.dbpedia.org/ontology/" + property, "");
-                        //if( it.hasNext() ) it = hdt.search(wdUri, "http://wikidata.dbpedia.org/ontology/" + property, "");
-                        while (it.hasNext()) {
-                            TripleString ts = it.next();
-//                            data.get(o).add(ts);
-                            data.get("fused").add(ts.asNtriple().toString());
-                            found = true;
-                            break;
-                        }
-                    } catch (NotFoundException nfe) {
-                        // TODO
-                    } catch (IOException e) {
-                        // TODO
+    public static HashSet<String> fuseEntity(String wkdId) {
+        String wkdUri = "http://wikidata.dbpedia.org/resource/Q"+wkdId;
+        HashSet<String> lookup = new HashSet<String>(properties);
+        HashSet<String> result = new HashSet<String>();
+        for (String o : prefOrd) {
+            HDT hdt = l.get(o);
+            try {
+                IteratorTripleString it = hdt.search(wkdUri, "", "");
+                while (it.hasNext()) {
+                    TripleString ts = it.next();
+                    String p = ts.getPredicate().toString();
+                    if( lookup.contains(p) ) {
+                        result.add(new TripleStringHelper(ts).asNtriple().toString());
+                        lookup.remove(p);
+                    } else if (p.equals(RDFS.label.getURI())) {
+                        result.add(new TripleStringHelper(ts).asNtriple().toString());
+                    } else if (p.equals(RDF.type.getURI())) {
+                        result.add(new TripleStringHelper(ts).asNtriple().toString());
                     }
                 }
+            } catch (NotFoundException nfe) {
+//                Logger.getLogger("NOTFOUND").info(wkdUri+" not found in "+o);
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
             }
-            handleLables(wdUri);
-            handleTypes(wdUri);
-
         }
 
-        // TODO increment file number
+        return result;
+    }
+
+    private static long max = 0;
+
+    public static void writeEntityData(HashSet<String> tripleSet, String Uri) {
+        Objects.requireNonNull(tripleSet);
+        max++;
         try {
-            writeFile4(ouDir, "fused.nt", data.get("fused"), gz);
+            for (String triple: tripleSet) {
+                fw.write(triple);
+            }
+            fw.flush();
         } catch (IOException ioe) {
+            Logger.getGlobal().warning("cant write triple");
             ioe.printStackTrace();
         }
-        System.out.println("Fused Triples "+data.get("fused").size());
-    }
-
-    public static void handleLables(String wdUri) {
-        for (String o : laOrd) {
-
-            try {
-                HDT hdt = l.get(o);
-                IteratorTripleString it = hdt.search(wdUri, RDFS.label.getURI(), "");
-                //if( it.hasNext() ) it = hdt.search(wdUri, "http://wikidata.dbpedia.org/ontology/" + property, "");
-                while (it.hasNext()) {
-                    TripleString ts = it.next();
-                    data.get("fused").add(new TripleStringHelper(ts).asNtriple().toString());
-                }
-            } catch (NotFoundException nfe) {
-                // TODO
-            }
-            catch (IOException e) {
-                // TODO
-            }
-        }
-    }
-
-    public static void handleTypes(String wdUri) {
-
-        for (String o : laOrd) {
-
-            try {
-                HDT hdt = l.get(o);
-                IteratorTripleString it = hdt.search(wdUri, RDF.type.getURI(), "");
-                //if( it.hasNext() ) it = hdt.search(wdUri, "http://wikidata.dbpedia.org/ontology/" + property, "");
-                while (it.hasNext()) {
-                    TripleString ts = it.next();
-                    data.get("fused").add(ts.asNtriple().toString());
-                }
-            } catch (NotFoundException nfe) {
-                // TODO
-            } catch (IOException e) {
-                // TODO
-        }
-
+        if(max % 10000 == 0) {
+            Logger.getGlobal().info("Entites done: "+max);
         }
     }
 
@@ -151,40 +102,61 @@ public static Map<String,Set<String>> data = new HashMap<String,Set<String>>();
 
         if (langToHDT == null) {
             langToHDT = new HashedMap();
-            for (String lang : laOrd) {
+            for (String lang : prefOrd) {
                 try {
-
-                    langToHDT.put(lang, HDTManager.loadIndexedHDT(inDir + lang + "/wkd_uris_selection.gz.hdt", null));
+                    HDT hdt =  HDTManager.loadIndexedHDT(inDir +lang +"/wkd_uris_selection.gz.hdt", null);
+                    langToHDT.put(lang, hdt);
+                    Logger.getGlobal().info("loaded datatset: "+lang);
                 } catch (Exception e) {
+                    e.printStackTrace();
                     System.err.println(e.getMessage());
                 }
             }
-            System.out.println("loaded " + langToHDT.size() + "/" + laOrd.size());
+            Logger.getGlobal().info("### loaded " + langToHDT.size() + "/" + prefOrd.size()+" ###");
         }
 
         return langToHDT;
 
     }
-    public static void writeFile4(String outpath, String filename , Set<String> data, boolean gz) throws IOException {
 
-        if(gz) {
-            File fout = new File(outpath + "/" + filename+".gz");
-            FileOutputStream fos = new FileOutputStream(fout);
-            OutputStreamWriter osw = new OutputStreamWriter(new GZIPOutputStream(fos), "UTF-8");
+    static final List<String> properties =  Arrays.asList(
+            "http://dbpedia.org/ontology/acceleration",
+            "http://dbpedia.org/ontology/averageAnnualGeneration",
+            "http://dbpedia.org/ontology/birthDate",
+            "http://dbpedia.org/ontology/birthYear",
+            "http://dbpedia.org/ontology/co2Emission",
+            "http://dbpedia.org/ontology/deathDate",
+            "http://dbpedia.org/ontology/deathYear",
+            "http://dbpedia.org/ontology/diameter",
+            "http://dbpedia.org/ontology/displacement",
+            "http://dbpedia.org/ontology/foalDate",
+            "http://dbpedia.org/ontology/fuelCapacity",
+            "http://dbpedia.org/ontology/fuelConsumption",
+            "http://dbpedia.org/ontology/height",
+            "http://dbpedia.org/ontology/installedCapacity",
+            "http://dbpedia.org/ontology/latestReleaseDate",
+            "http://dbpedia.org/ontology/length",
+            "http://dbpedia.org/ontology/marketCapitalisation",
+            "http://dbpedia.org/ontology/netIncome",
+            "http://dbpedia.org/ontology/operatingIncome",
+            "http://dbpedia.org/ontology/populationTotal",
+            "http://dbpedia.org/ontology/powerOutput",
+            "http://dbpedia.org/ontology/redline",
+            "http://dbpedia.org/ontology/restingDate",
+            "http://dbpedia.org/ontology/retirementDate",
+            "http://dbpedia.org/ontology/topSpeed",
+            "http://dbpedia.org/ontology/torqueOutput",
+            "http://dbpedia.org/ontology/weight",
+            "http://dbpedia.org/ontology/wheelbase",
+            "http://dbpedia.org/ontology/width",
+            "http://dbpedia.org/ontology/zipCode"
+    );
 
-            for (String t : data) {
-                osw.write(t);
-            }
-            osw.close();
-        } else {
-            File fout = new File(outpath + "/" + filename);
-            FileOutputStream fos = new FileOutputStream(fout);
-            OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+    public static void main(String[] args) {
+        long start = System.currentTimeMillis();
+        Fusion.run();
+        long end = System.currentTimeMillis();
 
-            for (String t : data) {
-                osw.write(t);
-            }
-            osw.close();
-        }
+        System.out.println("Took : " + ((end - start) / 1000));
     }
 }
