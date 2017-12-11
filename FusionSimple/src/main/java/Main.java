@@ -74,7 +74,9 @@ public class Main {
                 pref.add(line);
             }
 
-        } catch (FileNotFoundException fne) { fne.printStackTrace();
+        } catch (FileNotFoundException fne) {
+            Logger.getGlobal().warning("using no pref file");
+            pref.add(commandLine.getOptionValue("p"));
         } catch (IOException ioe ) { ioe.printStackTrace();
         }
 
