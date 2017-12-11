@@ -36,7 +36,7 @@ public class Fusion {
             e.printStackTrace();
         }
         run();
-
+        Logger.getGlobal().info("Entites done: "+max);
     }
 
     public static void run () {
