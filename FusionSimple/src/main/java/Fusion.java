@@ -81,7 +81,7 @@ public class Fusion {
 
     public static void writeEntityData(HashSet<String> tripleSet, String Uri) {
         Objects.requireNonNull(tripleSet);
-        max++;
+        if( tripleSet.size() > 0 ) max++;
         try {
             for (String triple: tripleSet) {
                 fw.write(triple);
