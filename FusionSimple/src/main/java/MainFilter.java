@@ -85,7 +85,7 @@ public class MainFilter {
         System.out.println("HDT FUSION COUNTER");
         System.out.println("==================");
         System.out.println("preference: "+pref_out);
-        
+
         // READ ids
         List<String> wkdUris = new ArrayList<>();
         try {

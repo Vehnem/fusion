@@ -84,7 +84,8 @@ public class FilterDataset {
         }
 
         for(String key :discardedProperty.keySet()) {
-            discardedCounter.get(key).addAndGet(discardedProperty.size());
+//          if(discardedProperty.get(key).size() > 1) System.out.println(discardedProperty.get(key));
+            discardedCounter.get(key).addAndGet(discardedProperty.get(key).size());
             counter.get(key).addAndGet(1);
             result.add("notEmpty");
         }
