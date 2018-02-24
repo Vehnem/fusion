@@ -1,3 +1,4 @@
+package dev;
 
 import org.rdfhdt.hdt.triples.TripleString;
 

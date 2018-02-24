@@ -1,5 +1,5 @@
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
+package dev;
+
 import org.apache.commons.collections.map.HashedMap;
 import org.rdfhdt.hdt.exceptions.NotFoundException;
 import org.rdfhdt.hdt.hdt.HDT;
@@ -7,9 +7,7 @@ import org.rdfhdt.hdt.hdt.HDTManager;
 import org.rdfhdt.hdt.triples.IteratorTripleString;
 import org.rdfhdt.hdt.triples.TripleString;
 
-import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
@@ -60,7 +58,7 @@ public class FilterDataset {
                     TripleString ts = it.next();
                     String p = ts.getPredicate().toString();
                     if( lookup.contains(p) ) {
-//                        result.add(new TripleStringHelper(ts).asNtriple().toString());
+//                        result.add(new def.TripleStringHelper(ts).asNtriple().toString());
 //                        lookup.remove(p);
                         if(discardedProperty.containsKey(p))
                             discardedProperty.get(p).add(new TripleStringHelper(ts).asNtriple().toString());
@@ -71,9 +69,9 @@ public class FilterDataset {
                         }
                     }
 //                    else if (p.equals(RDFS.label.getURI())) {
-//                        result.add(new TripleStringHelper(ts).asNtriple().toString());
+//                        result.add(new def.TripleStringHelper(ts).asNtriple().toString());
 //                    } else if (p.equals(RDF.type.getURI())) {
-//                        result.add(new TripleStringHelper(ts).asNtriple().toString());
+//                        result.add(new def.TripleStringHelper(ts).asNtriple().toString());
 //                    }
                 }
             } catch (NotFoundException nfe) {

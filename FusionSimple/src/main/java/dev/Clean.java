@@ -1,3 +1,5 @@
+package dev;
+
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import org.apache.commons.collections.map.HashedMap;

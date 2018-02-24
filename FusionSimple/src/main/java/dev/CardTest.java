@@ -1,3 +1,5 @@
+package dev;
+
 import org.rdfhdt.hdt.enums.RDFNotation;
 import org.rdfhdt.hdt.exceptions.NotFoundException;
 import org.rdfhdt.hdt.hdt.HDT;
@@ -9,10 +11,12 @@ import org.rdfhdt.hdt.triples.TripleString;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-public class LabelsTest {
+public class CardTest {
 
     public static void main ( String[] args ) throws IOException {
 
@@ -20,7 +24,7 @@ public class LabelsTest {
 
         String[] languages = {"en","wiki","de","sv","nl","fr","fused"};
 
-        String rdfType =  "http://dbpedia.org/ontology/Person";
+        String rdfType =  "http://dbpedia.org/ontology/Location";
         String header = "wdUri";
 //        Map <String, AtomicInteger> counter = new HashMap<String, AtomicInteger>();
 
@@ -30,25 +34,24 @@ public class LabelsTest {
             header += "\t"+l;
             lanMap.put(l,getCounts("/home/vehnem/workspace/fusion_data/out/2211/k100"+l+"/fused.nt",rdfType));
         }
-
         header+="\n";
 
-        String out =  rdfType == null ? "label_overall.tsv" :  "label_"+ rdfType.split("/")[rdfType.split("/").length-1] +".tsv";
+        String out =  rdfType == null ? "cardinality_overall.tsv" :  "cardinality_"+ rdfType.split("/")[rdfType.split("/").length-1] +".tsv";
 
         FileWriter fw = new FileWriter(new File(out));
         fw.write(header);
         for(int i = 1 ; i <= 100000; i++ ) {
             String q = "http://wikidata.dbpedia.org/resource/Q"+i;
 
-            if( lanMap.get("fused").containsKey(q) ) {
-                String line = q;
-                for(String l : languages) {
-                    int number = lanMap.get(l).get(q) == null ? 0 : lanMap.get(l).get(q);
-                    line += "\t"+number;
-                }
-                line += "\n";
-                fw.write(line);
-            }
+           if( lanMap.get("fused").containsKey(q) ) {
+               String line = q;
+               for(String l : languages) {
+                   int number = lanMap.get(l).get(q) == null ? 0 : lanMap.get(l).get(q);
+                   line += "\t"+number;
+               }
+               line += "\n";
+               fw.write(line);
+           }
         }
         fw.flush();
         fw.close();
@@ -60,7 +63,7 @@ public class LabelsTest {
                 int number = lanMap.get(l).get(q) == null ? 0 : lanMap.get(l).get(q);
                 ct += number;
             }
-            System.out.println(l+ " contains "+lanMap.get(l).keySet().size()+" entities "+ct+" labels");
+            System.out.println(l+ " contains "+lanMap.get(l).keySet().size()+" entities "+ct+" attributes");
         }
 
     }
@@ -84,8 +87,7 @@ public class LabelsTest {
                 Set<String> set = new HashSet<String>();
                 while( it.hasNext() ) {
                     TripleString ts = it.next();
-                    if(ts.getPredicate().toString().equals("http://www.w3.org/2000/01/rdf-schema#label"))
-                        set.add(ts.getObject().toString());
+                    set.add(ts.getPredicate().toString());
                     if(ts.getObject().toString().equals(rdfType)) typefound = true;
                 }
                 if(typefound || null == rdfType ) ctMap.put(wdUri,set.size());

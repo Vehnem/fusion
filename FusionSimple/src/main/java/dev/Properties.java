@@ -1,3 +1,5 @@
+package dev;
+
 public class Properties {
 
 //    public static String[] languages =  {"en","nl","sv","fr","de"};

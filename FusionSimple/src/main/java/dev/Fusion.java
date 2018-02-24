@@ -1,3 +1,5 @@
+package dev;
+
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import org.apache.commons.collections.map.HashedMap;
@@ -10,7 +12,6 @@ import org.rdfhdt.hdt.triples.TripleString;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.zip.GZIPOutputStream;
 
 public class Fusion {
 

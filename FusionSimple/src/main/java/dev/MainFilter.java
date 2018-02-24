@@ -1,3 +1,4 @@
+package dev;
 
 import org.apache.commons.cli.*;
 
@@ -6,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class MainClean {
+public class MainFilter {
 
     public static void main(String[] args) {
 
@@ -25,10 +26,8 @@ public class MainClean {
 
         Options options = new Options();
         options.addOption("i", "input", true, "input folder");
-        options.addOption("o", "out", true, "output file");
         options.addOption("p", "languages", true, "preference file");
         options.addOption("h", "help", false, "show this help");
-//        options.addOption("gz","gzip",false,"gzip output files");
         options.addOption("q","ids",true,"wkd id list");
 
 //        Option option = new Option("l", "language order list");
@@ -42,26 +41,21 @@ public class MainClean {
             commandLine = parser.parse(options, args);
 
             if (commandLine.hasOption("h")) {
-                formatter.printHelp("SimpleFusion", options);
+                formatter.printHelp("SimpleFusion def.Counter", options);
                 System.exit(0);
             }
-
-            if (commandLine.hasOption("i")&&commandLine.hasOption("o")&&commandLine.hasOption("p")&&commandLine.hasOption("q")) {
+            if (commandLine.hasOption("i")&&commandLine.hasOption("p")&&commandLine.hasOption("q")) {
                 inDir = commandLine.getOptionValue("i");
-                out = commandLine.getOptionValue("o");
                 prefFile = commandLine.getOptionValue("p");
                 ids = commandLine.getOptionValue("q");
-                if( commandLine.hasOption("gz")) {
-                    gz = true;
-                }
             }
             else {
-                formatter.printHelp("SimpleFusion", options);
+                formatter.printHelp("SimpleFusion def.Counter", options);
                 System.exit(0);
             }
 
         } catch (ParseException e) {
-            formatter.printHelp("SimpleFusion", options);
+            formatter.printHelp("SimpleFusion def.Counter", options);
             System.exit(1);
         }
 
@@ -89,19 +83,9 @@ public class MainClean {
                 pref_out += pref.get(s) + " > ";
             }
         }
-        System.out.println("HDT FUSION CLEANER");
+        System.out.println("HDT FUSION COUNTER");
         System.out.println("==================");
         System.out.println("preference: "+pref_out);
-
-        // CREATE DIRs
-        File file = new File(out);
-        if(!file.getParentFile().exists()) {
-            if (!file.getParentFile().mkdirs()) {
-                Logger.getGlobal().warning("Failed to create directory " + file.getParent());
-            } else {
-                Logger.getGlobal().info("Created directory "+ file.getParent());
-            }
-        }
 
         // READ ids
         List<String> wkdUris = new ArrayList<>();
@@ -118,9 +102,9 @@ public class MainClean {
             ioe.printStackTrace();
         }
 
-        // Fusion part
+        // def.Fusion part
         long start = System.currentTimeMillis();
-        new Clean(pref,wkdUris, inDir, out, gz);
+        new FilterDataset(pref,wkdUris, inDir);
         long end = System.currentTimeMillis();
         Logger.getGlobal().info("Took : " + ((end - start) / 1000)+" seconds");
 

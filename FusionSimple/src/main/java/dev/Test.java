@@ -1,15 +1,12 @@
-import com.hp.hpl.jena.rdf.model.*;
+package dev;
+
 import org.rdfhdt.hdt.hdt.HDT;
 import org.rdfhdt.hdt.hdt.HDTManager;
 import org.rdfhdt.hdt.triples.IteratorTripleString;
 import org.rdfhdt.hdt.triples.TripleString;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,26 +15,41 @@ public class Test {
     private static final Logger log = Logger.getLogger( Test.class.getName() );
     public static void main(String[] agrs) throws IOException{
 
-        int maxID = 1;
-        List<Integer> ids = new ArrayList<Integer>();
-        String[] languages = {"en","de","sv","nl","fr"};
-        // Test
-        String inDir = "/home/vehnem/workspace/fusion_data/new/";
+        Logger.getGlobal().log(Level.INFO,"info");
 
-        HDT hdt = HDTManager.loadIndexedHDT(inDir +"wikidata" + "/wkd_uris_selection.gz.hdt", null);
+        Logger.getLogger("DEFAULT").setUseParentHandlers(false);
+        Logger.getLogger("DEFAULT").log(Level.WARNING, "warning");
+
+
+
+//        int maxID = 1;
+//        List<Integer> ids = new ArrayList<Integer>();
+//        String[] languages = {"en","de","sv","nl","fr"};
+//        // def.Test
+        String inDir = "/home/vehnem/workspace/fusion_data/new/";
+//
+//        HDT hdt = HDTManager.loadIndexedHDT(inDir +"wikidata" + "/wkd_uris_selection.gz.hdt", null);
+//        HDT hdt = null;
+//        try {
+//             hdt = HDTManager.generateHDT("/home/vehnem/workspace/fusion_data/out/2211/k100fused/fused.nt", "http://base.uri", RDFNotation.NTRIPLES, new HDTSpecification(), null);
+//        } catch (Exception e) {
+//
+//        }
         String last = "";
         HashSet<String> types = new HashSet<String>();
 //        int i = 20000000;
 //        while(true){
             try {
-//                HDT hdt = HDTManager.loadIndexedHDT("/home/vehnem/workspace/fusion_data/new/k100fused/fused.nt", null);
-                IteratorTripleString it = hdt.search("",
-                        "", "");
+                HDT hdt = HDTManager.loadIndexedHDT("/home/vehnem/workspace/fusion_data/new/wikidata/wkd_uris_selection.gz.hdt", null);
+                IteratorTripleString it = hdt.search("http://wikidata.dbpedia.org/resource/Q37175","", "");
+//                IteratorTripleString it = hdt.search("",
+//                        "", "");
                 while (it.hasNext()) {
                     TripleString ts = it.next();
-                    int id = Integer.parseInt(ts.getSubject().toString().substring(38));
-                    maxID = id > maxID ?  id :  maxID;
-//                TripleStringHelper h = new TripleStringHelper(ts);
+                    System.out.println(ts.asNtriple());
+//                    int id = Integer.parseInt(ts.getSubject().toString().substring(38));
+//                    maxID = id > maxID ?  id :  maxID;
+//                def.TripleStringHelper h = new def.TripleStringHelper(ts);
 //                //mainmodel.add(getAsStatement(ts));
 //                FileWriter fw = new FileWriter(new File("test"));
 //                fw.write(h.asNtriple().toString());
@@ -48,7 +60,7 @@ public class Test {
                 System.out.println(e.toString());
             }
 //            i++;
-            log.info(String.valueOf(maxID));
+//            log.info(String.valueOf(maxID));
 //        }
 
 //        for(String t : types ) {

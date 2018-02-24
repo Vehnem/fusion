@@ -1,3 +1,4 @@
+package dev;
 
 import org.apache.commons.cli.*;
 
@@ -118,7 +119,7 @@ public class Main {
             ioe.printStackTrace();
         }
 
-        // Fusion part
+        // def.Fusion part
         long start = System.currentTimeMillis();
         new Fusion(pref,wkdUris, inDir, out, gz);
         long end = System.currentTimeMillis();
