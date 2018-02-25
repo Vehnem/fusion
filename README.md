@@ -19,6 +19,9 @@ bin/simple-fusion -h
 ```
 bin/simple-fusion -i /fusion/hdtfolder/ -o /fusion/out/ -p FusionSimple/resources/preference  -q 100000
 ```
+
+If you want to use a diffrent baseUri from (http://wikidata.dbpedia.org/resource/Q) use --base-id YourBaseUri
+
 ## Advanced
 
 For automated setup with hdt creation and rdfunit, 
