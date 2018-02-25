@@ -1,24 +1,29 @@
 package fusion;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.Buffer;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.logging.Logger;
+import java.util.zip.GZIPOutputStream;
 
 public class FusionWriter {
 
-    protected static long max = 0;
-    protected static FileWriter fw = null;
-    protected static String lastUri = null;
+    protected long max = 0;
+
+    protected String lastUri = "";
+
+    protected BufferedWriter bw = null;
 
     FusionWriter(String out, boolean gz) {
-        try {
-            fw = new FileWriter(out);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
+        if(gz) {
+            try {
+                bw = new BufferedWriter(new OutputStreamWriter( new GZIPOutputStream(new FileOutputStream(out + ".gz"))));
+            } catch (IOException ioe ) { ioe.printStackTrace();}
+        } else {
+            try {
+                bw = new BufferedWriter(new OutputStreamWriter((new FileOutputStream(out))));
+            }catch ( IOException ioe ) {ioe.printStackTrace();}
         }
     }
 
@@ -27,23 +32,23 @@ public class FusionWriter {
         if( tripleSet.size() > 0 ) max++;
         try {
             for (String triple: tripleSet) {
-                fw.write(triple);
+                bw.write(triple);
             }
-            fw.flush();
+            bw.flush();
+            lastUri = rUri;
         } catch (IOException ioe) {
             Logger.getGlobal().warning("cant write triple");
             ioe.printStackTrace();
         }
         if(max % 10000 == 0) {
             Logger.getGlobal().info("Entites done: "+max);
-            lastUri = rUri;
             Logger.getGlobal().info("last one: "+lastUri);
         }
     }
 
     public void close() {
         try {
-            fw.close();
+           bw.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -57,3 +62,12 @@ public class FusionWriter {
         return lastUri;
     }
 }
+
+//protected static FileWriter bw = null;
+
+//            try {
+//            bw = new FileWriter(out);
+//            } catch (Exception e) {
+//            e.printStackTrace();
+//            System.exit(1);
+//            }

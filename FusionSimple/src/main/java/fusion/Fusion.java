@@ -2,8 +2,6 @@ package fusion;
 
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
-import dev.TripleStringHelper;
-import io.netty.util.internal.chmv8.ConcurrentHashMapV8;
 import org.apache.commons.collections.map.HashedMap;
 import org.rdfhdt.hdt.exceptions.NotFoundException;
 import org.rdfhdt.hdt.hdt.HDT;
@@ -16,6 +14,9 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
 
+/**
+ *
+ */
 public class Fusion {
 
     protected static FileWriter fw = null;
@@ -46,21 +47,28 @@ public class Fusion {
 
         run();
         Logger.getGlobal().info("Entites done: "+fusionWriter.getNumberOfEntities());
-        Logger.getGlobal().info("Last Entity: "+fusionWriter.getLastUri());
+        Logger.getGlobal().info("Last written Entity: "+fusionWriter.getLastUri());
 
         fusionWriter.close();
     }
 
+    /**
+     * Iterative process over each Resource
+     */
     public static void run () {
         l = getMap();
         for ( long id = 1; id <= qMax; id++) {//(String n : wkdUris) {
             String rUri = baseUri+id;
             HashSet<String> entityTriple= fuseEntity(rUri);
             fusionWriter.write(entityTriple, rUri);
-            System.out.println(rUri);
         }
     }
 
+    /**
+     * Fusion function for each resource
+     * @param rUri
+     * @return
+     */
     public static HashSet<String> fuseEntity(String rUri) {
         HashSet<String> lookup = new HashSet<String>(FunctionalProperties.get());
         HashSet<String> result = new HashSet<String>();
@@ -75,9 +83,11 @@ public class Fusion {
                         result.add(new TripleStringHelper(ts).asNtriple().toString());
                         lookup.remove(p);
                     } else if(onlyfunc) {
+                        // RDFS:label
                         if (p.equals(RDFS.label.getURI())) {
                             result.add(new TripleStringHelper(ts).asNtriple().toString());
                         }
+                        // RDF:TYPE
                         if (p.equals(RDF.type.getURI())) {
                             result.add(new TripleStringHelper(ts).asNtriple().toString());
                         }
@@ -91,10 +101,13 @@ public class Fusion {
                 ioe.printStackTrace();
             }
         }
-
         return result;
     }
 
+    /**
+     * Return map with loaded HDT databases
+     * @return
+     */
     public static Map getMap() {
 
         Map<String, HDT> langToHDT = null;
@@ -103,6 +116,7 @@ public class Fusion {
             langToHDT = new HashedMap();
             for (String lang : prefOrd) {
                 try {
+                    // Hardcoded filename for hdts
                     HDT hdt =  HDTManager.loadIndexedHDT(inDir +lang +"/wkd_uris_selection.gz.hdt", null);
                     langToHDT.put(lang, hdt);
                     Logger.getGlobal().info("loaded datatset: "+lang);

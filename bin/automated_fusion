@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#export MAVEN_OPTS="-Xmx20G"
+
+source bin/config.sh
+
+cd FusionSimple
+if [ ! -d "target" ]; then
+	echo "First compiling code..."
+	mvn package
+	echo "Compiling finished..."
+fi
+
+java -Xmx$xmx -jar target/FusionSimple-1.0-SNAPSHOT-jar-with-dependencies.jar \
+  -i $hdtfolder \
+  -o $outFolder \
+  -p $preference \
+  -q $maxId \
+  -gz

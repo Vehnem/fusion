@@ -10,16 +10,21 @@ import java.util.logging.Logger;
 public class CliUtils {
 
     private static Options options = new Options();
+
+    public CliUtils() {
+        super();
+    }
+
     static {
-        options.addOption("i", "infolder", true, "input folder");
-        options.addOption("o", "outfile", true, "output file");
-        options.addOption("p", "pref-lang", true, "preference file");
-        options.addOption("h", "help", false, "show this help");
+        options.addOption(OptionBuilder.withLongOpt("infolder").withDescription("input folder").hasArg().withArgName("FOLDER").isRequired().create('i'));
+        options.addOption(OptionBuilder.withLongOpt("outfolder").withDescription("output folder").hasArg().withArgName("FOLDER").isRequired().create('o'));
+        options.addOption(OptionBuilder.withLongOpt("pref-file").withDescription("preference file").hasArg().withArgName("FILE").isRequired().create('p'));
+        options.addOption(OptionBuilder.withLongOpt("qmax").withDescription("max numeric id").hasArg().withArgName("LONG").isRequired().create('q'));
         options.addOption("gz","gzip",false,"gzip output files");
-        options.addOption("q","qmax",true,"wkd id list");
-        options.addOption(null,"only-func",false,"wkd id list");
+        options.addOption(null,"only-func",false,"only functional properties");
         options.addOption(null,"base-id",true,"suffix of resource Uris");
         options.addOption(null,"file-name",true,"file name of output");
+        options.addOption("h", "help", false, "show this help");
     }
 
     public static CommandLine getCommnadLine(String[] args ) {
@@ -36,7 +41,7 @@ public class CliUtils {
 
     public static void printHelp() {
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("SimpleFusion", options);
+        formatter.printHelp("simple-fusion", options,true);
         System.exit(0);
     }
 
